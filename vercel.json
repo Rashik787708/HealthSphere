@@ -1,7 +1,7 @@
 {
   "version": 2,
   "cleanUrls": true,
-  "public": true,
+
   "headers": [
     {
       "source": "/(.*)",
@@ -34,6 +34,7 @@
       ]
     }
   ],
+
   "rewrites": [
     {
       "source": "/api/doctors/:id",
