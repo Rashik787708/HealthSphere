@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Create Account — HealthSphere</title>
+  <link rel="stylesheet" href="/css/global.css">
+  <link rel="stylesheet" href="/css/components.css">
+  <link rel="stylesheet" href="/css/dashboard.css">
+  <link rel="stylesheet" href="/css/responsive.css">
+</head>
+<body>
+  <header></header>
+
+  <main class="main-content" style="display:flex;align-items:center;justify-content:center;padding:2.5rem 1rem;">
+    <div style="width:100%;max-width:540px;">
+      <div class="card" style="box-shadow:var(--shadow-xl);border-radius:var(--radius-lg);padding:2rem;">
+        <div style="text-align:center;margin-bottom:1.5rem;">
+          <div class="brand-icon" style="margin:0 auto 0.75rem;width:3rem;height:3rem;font-size:1.5rem;">⚕</div>
+          <h2 style="font-size:1.6rem;margin-bottom:0.25rem;">Create Your Account</h2>
+          <p style="font-size:0.875rem;">Join the HealthSphere Healthcare Platform</p>
+        </div>
+
+        <form id="register-form">
+          <div class="form-group">
+            <label class="form-label" for="reg-role">I am registering as a:</label>
+            <select id="reg-role" class="form-select" required>
+              <option value="PATIENT" selected>Patient (Personal Health & Booking)</option>
+              <option value="DOCTOR">Doctor (Practitioner & Prescriptions)</option>
+              <option value="HOSPITAL">Hospital / Clinical Organization</option>
+            </select>
+          </div>
+
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+            <div class="form-group">
+              <label class="form-label" for="reg-name">Full Name</label>
+              <input type="text" id="reg-name" class="form-control" required placeholder="e.g. Eleanor Vance">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="reg-email">Email Address</label>
+              <input type="email" id="reg-email" class="form-control" required placeholder="eleanor@example.com">
+            </div>
+          </div>
+
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+            <div class="form-group">
+              <label class="form-label" for="reg-password">Password (min 6 chars)</label>
+              <input type="password" id="reg-password" class="form-control" minlength="6" required placeholder="••••••••">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="reg-phone">Phone Number</label>
+              <input type="tel" id="reg-phone" class="form-control" placeholder="+1-555-0199">
+            </div>
+          </div>
+
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+            <div class="form-group">
+              <label class="form-label" for="reg-blood">Blood Group</label>
+              <select id="reg-blood" class="form-select">
+                <option value="">Select Blood Group</option>
+                <option value="A+">A+</option>
+                <option value="A-">A-</option>
+                <option value="B+">B+</option>
+                <option value="B-">B-</option>
+                <option value="AB+">AB+</option>
+                <option value="AB-">AB-</option>
+                <option value="O+">O+</option>
+                <option value="O-">O-</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="reg-location">City / Location</label>
+              <input type="text" id="reg-location" class="form-control" placeholder="e.g. Seattle, WA">
+            </div>
+          </div>
+
+          <!-- Doctor-specific section -->
+          <div id="doctor-specific-fields" style="display:none;background:var(--primary-subtle);padding:1rem;border-radius:var(--radius-md);margin-bottom:1.25rem;border:1px solid var(--primary-light);">
+            <h4 style="font-size:0.9375rem;color:var(--primary);margin-bottom:0.75rem;">🩺 Doctor Credentials</h4>
+            
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;">
+              <div class="form-group" style="margin-bottom:0.75rem;">
+                <label class="form-label" for="reg-spec">Specialization</label>
+                <input type="text" id="reg-spec" class="form-control" placeholder="e.g. Cardiology, Pediatrics">
+              </div>
+              <div class="form-group" style="margin-bottom:0.75rem;">
+                <label class="form-label" for="reg-qual">Qualification</label>
+                <input type="text" id="reg-qual" class="form-control" placeholder="e.g. MBBS, MD, FACC">
+              </div>
+            </div>
+
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;">
+              <div class="form-group" style="margin-bottom:0.75rem;">
+                <label class="form-label" for="reg-hospital">Hospital / Clinic</label>
+                <input type="text" id="reg-hospital" class="form-control" placeholder="e.g. City General Hospital">
+              </div>
+              <div class="form-group" style="margin-bottom:0.75rem;">
+                <label class="form-label" for="reg-fee">Consultation Fee ($)</label>
+                <input type="number" id="reg-fee" class="form-control" value="60">
+              </div>
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-primary" style="width:100%;padding:0.75rem;margin-top:0.5rem;" id="reg-submit-btn">
+            Create Account &rarr;
+          </button>
+        </form>
+
+        <p style="text-align:center;font-size:0.875rem;margin-top:1.5rem;">
+          Already registered? <a href="/login.html" style="font-weight:600;">Sign in here</a>
+        </p>
+      </div>
+    </div>
+  </main>
+
+  <script type="module">
+    import { api, setToken, showToast } from '/js/api.js';
+    import { setupNavigation } from '/js/auth.js';
+
+    setupNavigation('register');
+
+    const roleSelect = document.getElementById('reg-role');
+    const doctorFields = document.getElementById('doctor-specific-fields');
+
+    roleSelect.addEventListener('change', () => {
+      if (roleSelect.value === 'DOCTOR') {
+        doctorFields.style.display = 'block';
+      } else {
+        doctorFields.style.display = 'none';
+      }
+    });
+
+    const form = document.getElementById('register-form');
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const submitBtn = document.getElementById('reg-submit-btn');
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Creating account...';
+
+      try {
+        const payload = {
+          role: roleSelect.value,
+          name: document.getElementById('reg-name').value,
+          email: document.getElementById('reg-email').value,
+          password: document.getElementById('reg-password').value,
+          phone: document.getElementById('reg-phone').value,
+          blood_group: document.getElementById('reg-blood').value,
+          location: document.getElementById('reg-location').value,
+        };
+
+        if (payload.role === 'DOCTOR') {
+          payload.specialization = document.getElementById('reg-spec').value || 'General Medicine';
+          payload.qualification = document.getElementById('reg-qual').value || 'MBBS';
+          payload.hospital_name = document.getElementById('reg-hospital').value || 'City Clinic';
+          payload.consultation_fee = document.getElementById('reg-fee').value || 50;
+        }
+
+        const res = await api.post('/auth/register', payload);
+        if (res.success && res.data?.token) {
+          setToken(res.data.token);
+          showToast('Account created successfully! Welcome to HealthSphere.', 'success');
+          setTimeout(() => {
+            if (payload.role === 'DOCTOR') window.location.href = '/doctor-dashboard.html';
+            else if (payload.role === 'HOSPITAL') window.location.href = '/blood-network.html';
+            else window.location.href = '/patient-dashboard.html';
+          }, 400);
+        }
+      } catch (err) {
+        showToast(err.message, 'danger');
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Create Account →';
+      }
+    });
+  </script>
+</body>
+</html>

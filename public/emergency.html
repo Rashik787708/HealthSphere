@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Emergency Blood Portal — HealthSphere</title>
+  <link rel="stylesheet" href="/css/global.css">
+  <link rel="stylesheet" href="/css/components.css">
+  <link rel="stylesheet" href="/css/dashboard.css">
+  <link rel="stylesheet" href="/css/responsive.css">
+</head>
+<body style="background:#FFF9F9;">
+  <header></header>
+
+  <main class="main-content">
+    <div class="container">
+      <div style="background:linear-gradient(135deg, #DC2626 0%, #991B1B 100%);color:#FFFFFF;border-radius:var(--radius-lg);padding:2.5rem;margin-bottom:2.5rem;box-shadow:var(--shadow-xl);">
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1.5rem;">
+          <div>
+            <span class="badge" style="background:rgba(255,255,255,0.25);color:#FFFFFF;margin-bottom:0.75rem;">Priority Transfusion Triage</span>
+            <h1 style="color:#FFFFFF;font-size:2.25rem;margin-bottom:0.5rem;">🚨 Emergency Blood Response Portal</h1>
+            <p style="color:#FEE2E2;max-width:650px;font-size:1.05rem;">
+              Critical requests are broadcasted in real time to all medically compatible ABO/Rh donors in the regional network.
+            </p>
+          </div>
+          <div>
+            <button class="btn btn-lg btn-secondary" id="instant-emergency-request-btn" style="background:#FFFFFF;color:var(--danger);font-weight:800;border:none;">
+              ⚡ Post Emergency Request
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-bottom:1.5rem;display:flex;justify-content:space-between;align-items:center;">
+        <h3 style="color:var(--danger);">Active Critical Emergency Requests</h3>
+        <span style="font-size:0.875rem;color:var(--text-muted);">Auto-refreshed with live donor matching</span>
+      </div>
+
+      <div id="emergency-requests-container">
+        <p>Loading emergency requests...</p>
+      </div>
+
+      <!-- Medical Disclaimer Banner as required by Prompt Section 20/21 -->
+      <div class="card" style="margin-top:2.5rem;background:#F8FAFC;border-left:4px solid var(--primary);">
+        <h4 style="margin-bottom:0.5rem;color:var(--primary);">ℹ️ Clinical Transfusion Notice</h4>
+        <p style="font-size:0.875rem;line-height:1.6;color:var(--text-muted);margin:0;">
+          This emergency portal serves as a notification and donor coordination aid. Emergency requests do not guarantee donor arrival or physiological compatibility. Actual blood compatibility testing, antibody screening, and cross-matching must be performed by certified hospital blood bank personnel prior to transfusion.
+        </p>
+      </div>
+    </div>
+  </main>
+
+  <!-- Emergency Request Modal -->
+  <div class="modal-overlay" id="emergency-request-modal">
+    <div class="modal-dialog">
+      <div class="modal-header" style="background:var(--danger-light);">
+        <h3 class="modal-title" style="color:var(--danger);">🚨 Post Urgent Emergency Blood Request</h3>
+        <button class="close-modal-btn" id="close-emergency-modal-btn">&times;</button>
+      </div>
+      <form id="emergency-request-form">
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label" for="emg-patient-name">Patient Name</label>
+            <input type="text" id="emg-patient-name" class="form-control" required placeholder="Patient full name">
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+            <div class="form-group">
+              <label class="form-label" for="emg-blood-group">Blood Group Needed</label>
+              <select id="emg-blood-group" class="form-select" required>
+                <option value="O-">O- (Universal Red Cell)</option>
+                <option value="O+">O+</option>
+                <option value="A-">A-</option>
+                <option value="A+">A+</option>
+                <option value="B-">B-</option>
+                <option value="B+">B+</option>
+                <option value="AB-">AB-</option>
+                <option value="AB+">AB+</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="emg-rh-type">Rh Type</label>
+              <select id="emg-rh-type" class="form-select">
+                <option value="-">Negative (-)</option>
+                <option value="+">Positive (+)</option>
+              </select>
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+            <div class="form-group">
+              <label class="form-label" for="emg-units">Units Required</label>
+              <input type="number" id="emg-units" class="form-control" min="1" max="10" value="2" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="emg-location">Hospital ER / Ward</label>
+              <input type="text" id="emg-location" class="form-control" required placeholder="e.g. St. Jude ER Trauma Bay 1">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="emg-reason">Clinical Trauma Details</label>
+            <textarea id="emg-reason" class="form-control" required placeholder="e.g. Acute surgical hemorrhage, trauma resuscitation"></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-danger" style="font-weight:700;">🚨 Broadcast Emergency Alert</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <div class="container">
+      <p style="margin:0;font-size:0.8125rem;">HealthSphere &copy; 2026. Rapid Emergency Blood Triage.</p>
+    </div>
+  </footer>
+
+  <script type="module">
+    import { setupNavigation } from '/js/auth.js';
+    import { initEmergencyPage } from '/js/emergency.js';
+
+    await setupNavigation('emergency');
+    await initEmergencyPage();
+  </script>
+</body>
+</html>

@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Appointments — HealthSphere</title>
+  <link rel="stylesheet" href="/css/global.css">
+  <link rel="stylesheet" href="/css/components.css">
+  <link rel="stylesheet" href="/css/dashboard.css">
+  <link rel="stylesheet" href="/css/responsive.css">
+</head>
+<body>
+  <header></header>
+
+  <main class="main-content">
+    <div class="container">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2rem;flex-wrap:wrap;gap:1rem;">
+        <div>
+          <h2>📅 Consultations & Appointments</h2>
+          <p>Schedule, manage, and review your healthcare consultations.</p>
+        </div>
+        <div style="display:flex;gap:0.75rem;align-items:center;">
+          <select id="appointment-status-filter" class="form-select" style="width:auto;">
+            <option value="ALL">All Statuses</option>
+            <option value="PENDING">Pending</option>
+            <option value="CONFIRMED">Confirmed</option>
+            <option value="COMPLETED">Completed</option>
+            <option value="CANCELLED">Cancelled</option>
+          </select>
+          <button class="btn btn-primary" id="open-book-modal-btn">+ Book Appointment</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div id="appointments-table-container">
+          <p>Loading appointments...</p>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Book Appointment Modal -->
+  <div class="modal-overlay" id="book-appointment-modal">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 class="modal-title">📅 Schedule Consultation</h3>
+        <button class="close-modal-btn" id="close-book-modal-btn">&times;</button>
+      </div>
+      <form id="book-appointment-form">
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label" for="booking-doctor-select">Choose Doctor</label>
+            <select id="booking-doctor-select" class="form-select" required></select>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+            <div class="form-group">
+              <label class="form-label" for="booking-date-input">Appointment Date</label>
+              <input type="date" id="booking-date-input" class="form-control" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="booking-time-select">Available Slot</label>
+              <select id="booking-time-select" class="form-select" required>
+                <option value="09:00">09:00 AM</option>
+                <option value="09:30">09:30 AM</option>
+                <option value="10:00">10:00 AM</option>
+                <option value="10:30">10:30 AM</option>
+                <option value="11:00">11:00 AM</option>
+                <option value="11:30">11:30 AM</option>
+                <option value="14:00">02:00 PM</option>
+                <option value="14:30">02:30 PM</option>
+                <option value="15:00">03:00 PM</option>
+                <option value="15:30">03:30 PM</option>
+                <option value="16:00">04:00 PM</option>
+                <option value="16:30">04:30 PM</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="booking-reason-input">Reason for Consultation</label>
+            <input type="text" id="booking-reason-input" class="form-control" required placeholder="e.g. Chest discomfort, annual wellness review">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="booking-notes-input">Notes or Known Allergies (Optional)</label>
+            <textarea id="booking-notes-input" class="form-control" placeholder="Share any relevant medical context..."></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-primary">Book Consultation</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <div class="container">
+      <p style="margin:0;font-size:0.8125rem;">HealthSphere &copy; 2026. Telehealth Appointment Engine.</p>
+    </div>
+  </footer>
+
+  <script type="module">
+    import { checkAuth, setupNavigation } from '/js/auth.js';
+    import { initAppointmentsPage } from '/js/appointments.js';
+
+    const user = await checkAuth();
+    if (user) {
+      await setupNavigation('appointments');
+      await initAppointmentsPage(user);
+    }
+  </script>
+</body>
+</html>

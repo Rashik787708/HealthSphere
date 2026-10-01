@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>User Profile Settings — HealthSphere</title>
+  <link rel="stylesheet" href="/css/global.css">
+  <link rel="stylesheet" href="/css/components.css">
+  <link rel="stylesheet" href="/css/dashboard.css">
+  <link rel="stylesheet" href="/css/responsive.css">
+</head>
+<body>
+  <header></header>
+
+  <main class="main-content">
+    <div class="container" style="max-width:760px;">
+      <div style="margin-bottom:2rem;">
+        <h2>👤 Account & Healthcare Profile</h2>
+        <p>Manage your personal demographic details, blood group, contact info, and medical practice settings.</p>
+      </div>
+
+      <div class="card">
+        <form id="profile-form">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+            <div class="form-group">
+              <label class="form-label" for="profile-name">Full Name</label>
+              <input type="text" id="profile-name" class="form-control" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="profile-email">Email Address</label>
+              <input type="email" id="profile-email" class="form-control" disabled style="background:var(--bg-muted);">
+            </div>
+          </div>
+
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+            <div class="form-group">
+              <label class="form-label" for="profile-role">Account Role</label>
+              <input type="text" id="profile-role" class="form-control" disabled style="background:var(--bg-muted);font-weight:700;">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="profile-phone">Phone Number</label>
+              <input type="tel" id="profile-phone" class="form-control">
+            </div>
+          </div>
+
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem;">
+            <div class="form-group">
+              <label class="form-label" for="profile-gender">Gender</label>
+              <select id="profile-gender" class="form-select">
+                <option value="">Select Gender</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="profile-dob">Date of Birth</label>
+              <input type="date" id="profile-dob" class="form-control">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="profile-blood-group">Blood Group</label>
+              <select id="profile-blood-group" class="form-select">
+                <option value="">Select</option>
+                <option value="A+">A+</option>
+                <option value="A-">A-</option>
+                <option value="B+">B+</option>
+                <option value="B-">B-</option>
+                <option value="AB+">AB+</option>
+                <option value="AB-">AB-</option>
+                <option value="O+">O+</option>
+                <option value="O-">O-</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="profile-location">City / Location</label>
+            <input type="text" id="profile-location" class="form-control" placeholder="e.g. Seattle, WA">
+          </div>
+
+          <!-- Doctor credentials section -->
+          <div id="doctor-profile-section" style="display:none;margin-top:1.5rem;padding-top:1.5rem;border-top:1px dashed var(--border-light);">
+            <h4 style="color:var(--primary);margin-bottom:1rem;">🩺 Doctor Practice Credentials</h4>
+
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+              <div class="form-group">
+                <label class="form-label" for="doctor-specialization">Specialization</label>
+                <input type="text" id="doctor-specialization" class="form-control">
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="doctor-qualification">Qualification</label>
+                <input type="text" id="doctor-qualification" class="form-control">
+              </div>
+            </div>
+
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+              <div class="form-group">
+                <label class="form-label" for="doctor-hospital">Hospital Affiliation</label>
+                <input type="text" id="doctor-hospital" class="form-control">
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="doctor-fee">Consultation Fee ($)</label>
+                <input type="number" id="doctor-fee" class="form-control">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="doctor-bio">Clinical Biography</label>
+              <textarea id="doctor-bio" class="form-control"></textarea>
+            </div>
+
+            <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:1rem;">
+              <input type="checkbox" id="doctor-available" style="width:1.1rem;height:1.1rem;accent-color:var(--primary);">
+              <label for="doctor-available" style="font-size:0.875rem;font-weight:600;cursor:pointer;">
+                Accepting new patient bookings
+              </label>
+            </div>
+          </div>
+
+          <div style="display:flex;justify-content:flex-end;margin-top:1.5rem;">
+            <button type="submit" class="btn btn-primary btn-lg">Save Profile Changes</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <p style="margin:0;font-size:0.8125rem;">HealthSphere &copy; 2026. Profile & Privacy Control.</p>
+    </div>
+  </footer>
+
+  <script type="module">
+    import { checkAuth, setupNavigation } from '/js/auth.js';
+    import { initProfilePage } from '/js/profile.js';
+
+    const user = await checkAuth();
+    if (user) {
+      await setupNavigation();
+      await initProfilePage();
+    }
+  </script>
+</body>
+</html>

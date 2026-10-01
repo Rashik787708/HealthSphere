@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Practitioner Dashboard — HealthSphere</title>
+  <link rel="stylesheet" href="/css/global.css">
+  <link rel="stylesheet" href="/css/components.css">
+  <link rel="stylesheet" href="/css/dashboard.css">
+  <link rel="stylesheet" href="/css/responsive.css">
+</head>
+<body>
+  <header></header>
+
+  <main class="main-content">
+    <div class="container">
+      <!-- Welcome Hero -->
+      <div class="dashboard-hero">
+        <div>
+          <span class="badge" style="background:rgba(255,255,255,0.2);color:#FFFFFF;margin-bottom:0.5rem;">Medical Practitioner Portal</span>
+          <h1>Welcome, <span id="doctor-welcome-name">Doctor</span></h1>
+          <p>Review consultation queues, confirm patient bookings, and document medical treatments.</p>
+        </div>
+        <div>
+          <a href="/prescriptions.html" class="btn btn-secondary btn-lg" style="background:#FFFFFF;color:var(--primary);font-weight:700;">
+            + Write Prescription
+          </a>
+        </div>
+      </div>
+
+      <!-- Quick Actions Grid -->
+      <div class="quick-actions-grid">
+        <a href="/appointments.html" class="action-card">
+          <span class="action-icon">📅</span>
+          <span class="action-title">Appointments</span>
+        </a>
+        <a href="/medical-records.html" class="action-card">
+          <span class="action-icon">📋</span>
+          <span class="action-title">Patient Records</span>
+        </a>
+        <a href="/prescriptions.html" class="action-card">
+          <span class="action-icon">💊</span>
+          <span class="action-title">Prescriptions</span>
+        </a>
+        <a href="/blood-network.html" class="action-card">
+          <span class="action-icon">🩸</span>
+          <span class="action-title">Blood Network</span>
+        </a>
+        <a href="/profile.html" class="action-card">
+          <span class="action-icon">🩺</span>
+          <span class="action-title">Availability & Profile</span>
+        </a>
+      </div>
+
+      <!-- Doctor Metrics Grid -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon primary">📅</div>
+          <div>
+            <div class="stat-value" id="doc-metric-today">0</div>
+            <div class="stat-label">Today's Visits</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon warning">⏳</div>
+          <div>
+            <div class="stat-value" id="doc-metric-pending">0</div>
+            <div class="stat-label">Pending Approval</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon success">✅</div>
+          <div>
+            <div class="stat-value" id="doc-metric-completed">0</div>
+            <div class="stat-label">Completed Consults</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon accent">👥</div>
+          <div>
+            <div class="stat-value" id="doc-metric-patients">0</div>
+            <div class="stat-label">Total Patients</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Appointments Queue -->
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">🩺 Consultations & Patient Queue</h3>
+          <a href="/appointments.html" class="btn btn-sm btn-secondary">Full Schedule</a>
+        </div>
+        <div id="doctor-appointments-list">
+          <p>Loading appointments queue...</p>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem;">
+      <p style="margin:0;font-size:0.8125rem;">HealthSphere &copy; 2026. Clinical Practice Management.</p>
+    </div>
+  </footer>
+
+  <script type="module">
+    import { checkAuth, setupNavigation } from '/js/auth.js';
+    import { initDoctorDashboard } from '/js/dashboard.js';
+
+    const user = await checkAuth(['DOCTOR', 'ADMIN']);
+    if (user) {
+      await setupNavigation('dashboard');
+      await initDoctorDashboard(user);
+    }
+  </script>
+</body>
+</html>

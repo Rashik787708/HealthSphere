@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Wellness Tracker & AI Assistant — HealthSphere</title>
+  <link rel="stylesheet" href="/css/global.css">
+  <link rel="stylesheet" href="/css/components.css">
+  <link rel="stylesheet" href="/css/dashboard.css">
+  <link rel="stylesheet" href="/css/responsive.css">
+</head>
+<body>
+  <header></header>
+
+  <main class="main-content">
+    <div class="container">
+      <div style="margin-bottom: 2rem;">
+        <h2>🌿 Daily Wellness & Lifestyle Guidance</h2>
+        <p>Log your restorative sleep, hydration, nutrition, and consult the AI Wellness Assistant for evidence-based lifestyle coaching.</p>
+      </div>
+
+      <!-- Wellness Summary Metrics -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon primary">😴</div>
+          <div>
+            <div class="stat-value" id="stat-avg-sleep">0.0 hrs</div>
+            <div class="stat-label">Average Sleep (30d)</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon accent">💧</div>
+          <div>
+            <div class="stat-value" id="stat-avg-water">0.0 L</div>
+            <div class="stat-label">Daily Water Average</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon success">🏃</div>
+          <div>
+            <div class="stat-value" id="stat-total-exercise">0 min</div>
+            <div class="stat-label">Total Activity (30d)</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon warning">⚖️</div>
+          <div>
+            <div class="stat-value" id="stat-latest-weight">N/A</div>
+            <div class="stat-label">Latest Recorded Weight</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="dashboard-grid">
+        <!-- Daily Wellness Entry Form & History -->
+        <div>
+          <div class="card" style="margin-bottom: 2rem;">
+            <div class="card-header">
+              <h3 class="card-title">📝 Log Daily Wellness</h3>
+              <span class="badge badge-primary">Daily Entry</span>
+            </div>
+            <form id="wellness-entry-form">
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                <div class="form-group">
+                  <label class="form-label">Record Date</label>
+                  <input type="date" id="wellness-log-date" class="form-control" required>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Sleep (Hours)</label>
+                  <input type="number" step="0.5" id="wellness-log-sleep" class="form-control" placeholder="e.g. 7.5">
+                </div>
+              </div>
+
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                <div class="form-group">
+                  <label class="form-label">Water Intake (Liters)</label>
+                  <input type="number" step="0.1" id="wellness-log-water" class="form-control" placeholder="e.g. 2.5">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Exercise (Minutes)</label>
+                  <input type="number" id="wellness-log-exercise" class="form-control" placeholder="e.g. 30">
+                </div>
+              </div>
+
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                <div class="form-group">
+                  <label class="form-label">Weight (kg)</label>
+                  <input type="number" step="0.1" id="wellness-log-weight" class="form-control" placeholder="e.g. 71.5">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Mood</label>
+                  <select id="wellness-log-mood" class="form-select">
+                    <option value="Energized">⚡ Energized</option>
+                    <option value="Calm" selected>😌 Calm / Focused</option>
+                    <option value="Tired">🥱 Tired / Fatigued</option>
+                    <option value="Stressed">😰 Stressed</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Meals & Nutrition Summary</label>
+                <input type="text" id="wellness-log-diet" class="form-control" placeholder="e.g. Oatmeal with fruit; Grilled chicken salad; Salmon with quinoa">
+              </div>
+
+              <button type="submit" class="btn btn-primary" style="width: 100%;">
+                Save Daily Wellness Entry
+              </button>
+            </form>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">📊 30-Day Activity & Wellness History</h3>
+            </div>
+            <div id="wellness-history-container">
+              <p>Loading wellness logs...</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- AI Wellness Assistant -->
+        <div>
+          <div class="card" style="position: sticky; top: 5.5rem;">
+            <div class="card-header">
+              <div>
+                <h3 class="card-title" style="display: flex; align-items: center; gap: 0.5rem;">
+                  🤖 AI Wellness Assistant
+                </h3>
+                <span style="font-size: 0.75rem; color: var(--text-muted);">Evidence-based lifestyle coach</span>
+              </div>
+              <span class="badge badge-success">Online</span>
+            </div>
+
+            <div style="margin-bottom: 0.75rem; display: flex; gap: 0.35rem; flex-wrap: wrap;">
+              <button class="btn btn-sm btn-secondary prompt-chip" style="font-size: 0.75rem;">🌙 Sleep Hygiene</button>
+              <button class="btn btn-sm btn-secondary prompt-chip" style="font-size: 0.75rem;">💧 Hydration Goals</button>
+              <button class="btn btn-sm btn-secondary prompt-chip" style="font-size: 0.75rem;">🥗 Balanced Meals</button>
+              <button class="btn btn-sm btn-secondary prompt-chip" style="font-size: 0.75rem;">🏃 Activity Pacing</button>
+            </div>
+
+            <div class="ai-chat-container">
+              <div class="ai-chat-messages" id="ai-chat-messages">
+                <div class="chat-bubble ai">
+                  👋 <strong>Hello! I am your HealthSphere Wellness Assistant.</strong>
+                  <br><br>
+                  I can provide actionable guidance on daily hydration, restful sleep routines, balanced nutrition, and activity targets.
+                  <br><br>
+                  <em style="font-size: 0.75rem; color: var(--text-muted);">
+                    ⚠️ Disclaimer: I offer lifestyle suggestions only and do not provide medical diagnosis or treatment.
+                  </em>
+                </div>
+              </div>
+              <div class="chat-input-bar">
+                <input type="text" id="ai-chat-input" class="form-control" placeholder="Ask about sleep, nutrition, water...">
+                <button class="btn btn-primary" id="ai-chat-send-btn">Send</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <p style="margin:0;font-size:0.8125rem;">HealthSphere &copy; 2026. Lifestyle & Wellness Engine.</p>
+    </div>
+  </footer>
+
+  <script type="module">
+    import { checkAuth, setupNavigation } from '/js/auth.js';
+    import { initWellnessPage } from '/js/wellness.js';
+
+    const user = await checkAuth();
+    if (user) {
+      await setupNavigation('wellness');
+      await initWellnessPage(user);
+    }
+  </script>
+</body>
+</html>

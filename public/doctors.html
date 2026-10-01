@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Find Doctors — HealthSphere</title>
+  <link rel="stylesheet" href="/css/global.css">
+  <link rel="stylesheet" href="/css/components.css">
+  <link rel="stylesheet" href="/css/dashboard.css">
+  <link rel="stylesheet" href="/css/responsive.css">
+</head>
+<body>
+  <header></header>
+
+  <main class="main-content">
+    <div class="container">
+      <div style="margin-bottom: 2rem;">
+        <h2>🩺 Verified Medical Practitioners</h2>
+        <p>Discover experienced healthcare specialists across hospitals and clinical disciplines.</p>
+      </div>
+
+      <!-- Filters Bar -->
+      <div class="card" style="margin-bottom: 2rem; padding: 1.25rem;">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; align-items: flex-end;">
+          <div>
+            <label class="form-label">Search Practitioner</label>
+            <input type="text" id="doctors-search-input" class="form-control" placeholder="Search name, hospital, city...">
+          </div>
+          <div>
+            <label class="form-label">Specialization</label>
+            <select id="doctors-spec-select" class="form-select">
+              <option value="">All Disciplines</option>
+            </select>
+          </div>
+          <div>
+            <label class="form-label">Max Fee ($)</label>
+            <input type="number" id="doctors-fee-input" class="form-control" placeholder="e.g. 100">
+          </div>
+          <div style="display: flex; align-items: center; gap: 0.5rem; padding-bottom: 0.5rem;">
+            <input type="checkbox" id="doctors-avail-check" style="width: 1.1rem; height: 1.1rem; accent-color: var(--primary);">
+            <label for="doctors-avail-check" style="font-size: 0.875rem; font-weight: 600; cursor: pointer;">
+              Available Only
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Doctors Grid -->
+      <div id="doctors-list-container">
+        <p>Loading practitioners...</p>
+      </div>
+    </div>
+  </main>
+
+  <!-- Book Appointment Modal -->
+  <div class="modal-overlay" id="book-appointment-modal">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 class="modal-title">📅 Schedule Consultation</h3>
+        <button class="close-modal-btn" id="close-book-modal-btn">&times;</button>
+      </div>
+      <form id="book-appointment-form">
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label">Doctor</label>
+            <select id="booking-doctor-select" class="form-select" required></select>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+            <div class="form-group">
+              <label class="form-label">Appointment Date</label>
+              <input type="date" id="booking-date-input" class="form-control" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Time Slot</label>
+              <select id="booking-time-select" class="form-select" required>
+                <option value="09:00">09:00 AM</option>
+                <option value="09:30">09:30 AM</option>
+                <option value="10:00">10:00 AM</option>
+                <option value="10:30">10:30 AM</option>
+                <option value="11:00">11:00 AM</option>
+                <option value="11:30">11:30 AM</option>
+                <option value="14:00">02:00 PM</option>
+                <option value="14:30">02:30 PM</option>
+                <option value="15:00">03:00 PM</option>
+                <option value="15:30">03:30 PM</option>
+                <option value="16:00">04:00 PM</option>
+                <option value="16:30">04:30 PM</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Reason for Consultation</label>
+            <input type="text" id="booking-reason-input" class="form-control" required placeholder="e.g. Health assessment, second opinion">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Notes (Optional)</label>
+            <textarea id="booking-notes-input" class="form-control" placeholder="Any symptoms or medical notes..."></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-primary">Book Consultation</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <div class="container">
+      <p style="margin:0;font-size:0.8125rem;">HealthSphere &copy; 2026. Verified Doctor Discovery Directory.</p>
+    </div>
+  </footer>
+
+  <script type="module">
+    import { setupNavigation } from '/js/auth.js';
+    import { initDoctorsPage } from '/js/doctors.js';
+
+    await setupNavigation('doctors');
+    await initDoctorsPage();
+  </script>
+</body>
+</html>

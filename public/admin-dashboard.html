@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Administration Overview — HealthSphere</title>
+  <link rel="stylesheet" href="/css/global.css">
+  <link rel="stylesheet" href="/css/components.css">
+  <link rel="stylesheet" href="/css/dashboard.css">
+  <link rel="stylesheet" href="/css/responsive.css">
+</head>
+<body>
+  <header></header>
+
+  <main class="main-content">
+    <div class="container">
+      <div class="dashboard-hero" style="background: linear-gradient(135deg, #1E293B 0%, #0F172A 100%);">
+        <div>
+          <span class="badge badge-danger" style="margin-bottom:0.5rem;">System Administration</span>
+          <h1 style="color:#FFFFFF;">Platform Command Center</h1>
+          <p style="color:#94A3B8;">Real-time ecosystem statistics, user governance, and security audit logs.</p>
+        </div>
+      </div>
+
+      <!-- High Level Statistics Grid -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon primary">👥</div>
+          <div>
+            <div class="stat-value" id="stat-total-users">0</div>
+            <div class="stat-label">Total Users</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon success">👤</div>
+          <div>
+            <div class="stat-value" id="stat-total-patients">0</div>
+            <div class="stat-label">Patients</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon info">🩺</div>
+          <div>
+            <div class="stat-value" id="stat-total-doctors">0</div>
+            <div class="stat-label">Doctors</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon warning">🏥</div>
+          <div>
+            <div class="stat-value" id="stat-total-hospitals">0</div>
+            <div class="stat-label">Hospitals</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon primary">📅</div>
+          <div>
+            <div class="stat-value" id="stat-apts-total">0</div>
+            <div class="stat-label">Total Consultations</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon warning">⏳</div>
+          <div>
+            <div class="stat-value" id="stat-apts-pending">0</div>
+            <div class="stat-label">Pending Bookings</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon danger">🩸</div>
+          <div>
+            <div class="stat-value" id="stat-blood-total">0</div>
+            <div class="stat-label">Blood Requests</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon danger" style="background:#FEE2E2;color:#DC2626;">🚨</div>
+          <div>
+            <div class="stat-value" id="stat-blood-emg">0</div>
+            <div class="stat-label">Emergency Requests</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- User Management Section -->
+      <div class="card" style="margin-bottom:2rem;">
+        <div class="card-header" style="flex-wrap:wrap;gap:1rem;">
+          <h3 class="card-title">👥 User Management & Role Governance</h3>
+          <div style="display:flex;gap:0.75rem;align-items:center;">
+            <select id="admin-role-filter" class="form-select" style="width:auto;">
+              <option value="ALL">All Roles</option>
+              <option value="PATIENT">Patients</option>
+              <option value="DOCTOR">Doctors</option>
+              <option value="HOSPITAL">Hospitals</option>
+              <option value="ADMIN">Admins</option>
+            </select>
+            <input type="text" id="admin-user-search" class="form-control" placeholder="Search name/email..." style="width:200px;">
+          </div>
+        </div>
+        <div id="admin-users-table-container">
+          <p>Loading users...</p>
+        </div>
+      </div>
+
+      <!-- Audit Logs Section -->
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">📜 Immutable System Audit Logs</h3>
+          <span class="badge badge-info">Security & Compliance</span>
+        </div>
+        <div id="admin-audit-logs-container">
+          <p>Loading audit trail...</p>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <p style="margin:0;font-size:0.8125rem;">HealthSphere &copy; 2026. Administrator Console.</p>
+    </div>
+  </footer>
+
+  <script type="module">
+    import { checkAuth, setupNavigation } from '/js/auth.js';
+    import { initAdminDashboard } from '/js/admin.js';
+
+    const user = await checkAuth(['ADMIN']);
+    if (user) {
+      await setupNavigation('dashboard');
+      await initAdminDashboard();
+    }
+  </script>
+</body>
+</html>

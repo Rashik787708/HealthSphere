@@ -1,0 +1,30 @@
+{
+  "name": "healthsphere",
+  "version": "1.0.0",
+  "description": "Production-Ready Full-Stack Healthcare Platform",
+  "main": "api/index.js",
+  "type": "module",
+  "scripts": {
+    "dev": "node scripts/dev-server.js",
+    "db:init": "node database/migrate.js",
+    "db:seed": "node database/seed.js",
+    "test": "node scripts/test-all.js"
+  },
+  "keywords": [
+    "healthcare",
+    "telehealth",
+    "turso",
+    "libsql",
+    "vercel",
+    "blood-donation",
+    "wellness"
+  ],
+  "author": "HealthSphere Team",
+  "license": "MIT",
+  "dependencies": {
+    "@libsql/client": "^0.14.0",
+    "bcryptjs": "^2.4.3",
+    "cookie": "^1.0.2",
+    "jsonwebtoken": "^9.0.2"
+  }
+}

@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Medical Records & Lab History — HealthSphere</title>
+  <link rel="stylesheet" href="/css/global.css">
+  <link rel="stylesheet" href="/css/components.css">
+  <link rel="stylesheet" href="/css/dashboard.css">
+  <link rel="stylesheet" href="/css/responsive.css">
+</head>
+<body>
+  <header></header>
+
+  <main class="main-content">
+    <div class="container">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2rem;flex-wrap:wrap;gap:1rem;">
+        <div>
+          <h2>📋 Digital Medical Records & Diagnostics</h2>
+          <p>Complete historical timeline of clinical consultations, diagnoses, and lab test results.</p>
+        </div>
+        <div style="display:flex;gap:0.75rem;align-items:center;">
+          <input type="text" id="records-search-input" class="form-control" placeholder="Search diagnosis or symptoms..." style="width:240px;">
+          <button class="btn btn-primary" id="open-add-record-modal-btn">+ Document Record</button>
+        </div>
+      </div>
+
+      <!-- Clinical Timeline -->
+      <div class="card" style="margin-bottom:2.5rem;">
+        <div class="card-header">
+          <h3 class="card-title">🩺 Clinical Consultation Timeline</h3>
+          <span class="badge badge-primary">Lifelong Medical History</span>
+        </div>
+        <div id="records-timeline-container">
+          <p>Loading medical records...</p>
+        </div>
+      </div>
+
+      <!-- Diagnostic Lab Reports -->
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">🧪 Laboratory & Diagnostic Reports</h3>
+          <span class="badge badge-info">Verified Lab Values</span>
+        </div>
+        <div id="lab-results-list-container">
+          <p>Loading lab diagnostics...</p>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Add Medical Record Modal (Doctors/Admin) -->
+  <div class="modal-overlay" id="add-record-modal">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 class="modal-title">📋 Document Clinical Consultation</h3>
+        <button class="close-modal-btn" id="close-record-modal-btn">&times;</button>
+      </div>
+      <form id="add-record-form">
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label" for="record-patient-id">Patient User ID</label>
+            <input type="text" id="record-patient-id" class="form-control" required placeholder="usr_...">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="record-diagnosis">Clinical Diagnosis</label>
+            <input type="text" id="record-diagnosis" class="form-control" required placeholder="e.g. Stage 1 Hypertension, Acute Pharyngitis">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="record-symptoms">Reported Symptoms</label>
+            <textarea id="record-symptoms" class="form-control" placeholder="Describe symptoms, duration, and patient complaints..."></textarea>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="record-notes">Clinical Assessment & Management Plan</label>
+            <textarea id="record-notes" class="form-control" placeholder="Treatment strategy, lifestyle interventions, follow-up instructions..."></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-primary">Save Medical Record</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <div class="container">
+      <p style="margin:0;font-size:0.8125rem;">HealthSphere &copy; 2026. Electronic Health Records (EHR).</p>
+    </div>
+  </footer>
+
+  <script type="module">
+    import { checkAuth, setupNavigation } from '/js/auth.js';
+    import { initMedicalRecordsPage } from '/js/medical-records.js';
+
+    const user = await checkAuth();
+    if (user) {
+      await setupNavigation('records');
+      await initMedicalRecordsPage(user);
+    }
+  </script>
+</body>
+</html>

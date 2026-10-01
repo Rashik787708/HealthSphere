@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Digital Prescriptions — HealthSphere</title>
+  <link rel="stylesheet" href="/css/global.css">
+  <link rel="stylesheet" href="/css/components.css">
+  <link rel="stylesheet" href="/css/dashboard.css">
+  <link rel="stylesheet" href="/css/responsive.css">
+</head>
+<body>
+  <header></header>
+
+  <main class="main-content">
+    <div class="container">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2rem;flex-wrap:wrap;gap:1rem;">
+        <div>
+          <h2>💊 Digital Prescriptions (Rx)</h2>
+          <p>Access your authorized pharmaceutical prescriptions with verified doctor signatures.</p>
+        </div>
+        <button class="btn btn-primary" id="open-create-rx-btn">+ Issue Prescription</button>
+      </div>
+
+      <div id="prescriptions-grid-container">
+        <p>Loading digital prescriptions...</p>
+      </div>
+    </div>
+  </main>
+
+  <!-- Printable Prescription View Modal -->
+  <div class="modal-overlay" id="printable-rx-modal">
+    <div class="modal-dialog" style="max-width:680px;">
+      <div class="modal-header no-print">
+        <h3 class="modal-title">Official Medical Prescription (Rx)</h3>
+        <div style="display:flex;gap:0.5rem;align-items:center;">
+          <button class="btn btn-sm btn-primary" id="print-rx-btn">🖨️ Print Prescription</button>
+          <button class="close-modal-btn" id="close-rx-modal-btn">&times;</button>
+        </div>
+      </div>
+      <div class="modal-body" id="rx-print-content" style="padding:0;"></div>
+    </div>
+  </div>
+
+  <!-- Create Prescription Modal (Doctors/Admin) -->
+  <div class="modal-overlay" id="create-rx-modal">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 class="modal-title">💊 Issue Digital Prescription</h3>
+        <button class="close-modal-btn" id="close-create-rx-modal-btn">&times;</button>
+      </div>
+      <form id="create-rx-form">
+        <div class="modal-body">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+            <div class="form-group">
+              <label class="form-label" for="create-rx-patient-id">Patient ID</label>
+              <input type="text" id="create-rx-patient-id" class="form-control" required placeholder="usr_...">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="create-rx-appointment-id">Appointment ID (Optional)</label>
+              <input type="text" id="create-rx-appointment-id" class="form-control" placeholder="apt_...">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="create-rx-medication">Medication Name</label>
+            <input type="text" id="create-rx-medication" class="form-control" required placeholder="e.g. Amoxicillin Trihydrate, Atorvastatin">
+          </div>
+
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+            <div class="form-group">
+              <label class="form-label" for="create-rx-dosage">Dosage / Strength</label>
+              <input type="text" id="create-rx-dosage" class="form-control" required placeholder="e.g. 500mg, 10ml">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="create-rx-frequency">Frequency</label>
+              <input type="text" id="create-rx-frequency" class="form-control" required placeholder="e.g. Twice daily after meals">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="create-rx-duration">Duration</label>
+            <input type="text" id="create-rx-duration" class="form-control" required placeholder="e.g. 7 days, 30 days">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="create-rx-instructions">Patient Instructions & Special Precautions</label>
+            <textarea id="create-rx-instructions" class="form-control" placeholder="Take with full glass of water. Avoid alcohol during treatment..."></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-primary">Authorize & Issue Rx</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <div class="container">
+      <p style="margin:0;font-size:0.8125rem;">HealthSphere &copy; 2026. Electronic Prescription Services.</p>
+    </div>
+  </footer>
+
+  <script type="module">
+    import { checkAuth, setupNavigation } from '/js/auth.js';
+    import { initPrescriptionsPage } from '/js/prescriptions.js';
+
+    const user = await checkAuth();
+    if (user) {
+      await setupNavigation('prescriptions');
+      await initPrescriptionsPage(user);
+    }
+  </script>
+</body>
+</html>
