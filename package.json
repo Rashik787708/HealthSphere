@@ -8,7 +8,9 @@
     "dev": "node scripts/dev-server.js",
     "db:init": "node database/migrate.js",
     "db:seed": "node database/seed.js",
-    "test": "node scripts/test-all.js"
+    "test": "node scripts/test-all.js && node scripts/test-api.js",
+    "test:unit": "node scripts/test-all.js",
+    "test:api": "node scripts/test-api.js"
   },
   "keywords": [
     "healthcare",

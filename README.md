@@ -69,10 +69,58 @@ Designed from the ground up for **Vercel Serverless Function architecture** with
 ```
 
 - **Frontend**: Pure HTML5, modern CSS3 (Custom Properties, Grid, Flexbox), and modular Vanilla JavaScript ES Modules. No heavy frontend framework runtime overhead.
-- **Backend**: Node.js Vercel Serverless Functions (`/api/*`) exporting stateless handlers (`export default async function handler(req, res)`).
+- **Backend**: **A single** Vercel Serverless Function (`api/[...route].js`) that routes every `/api/*` request internally through `lib/router.js`. See [Why a single function](#-why-a-single-serverless-function) below.
+- **Route modules**: `lib/accounts.js`, `doctors.js`, `appointments.js`, `medical-records.js`, `lab-results.js`, `prescriptions.js`, `wellness.js`, `blood.js`, `notifications.js`, `admin.js` — plain backend modules bundled into that function, never detected by Vercel as separate functions.
 - **Database**: Turso libSQL (`@libsql/client`). Supports Turso cloud clusters or local SQLite files (`file:healthsphere.db`) seamlessly.
 - **Authentication**: Pure JavaScript `bcryptjs` password hashing, signed JSON Web Tokens (JWT) with HTTP-only cookies and Bearer token fallback.
-- **Security**: Parameterized SQL queries (preventing SQL injection), XSS-safe output sanitization, strict CORS headers, and audit trails.
+- **Security**: Parameterized SQL queries (preventing SQL injection), XSS-safe output sanitization, security headers, fixed-window rate limiting, and audit trails.
+
+---
+
+## 💡 Why a Single Serverless Function
+
+The Vercel **Hobby** plan allows a maximum of **12 Serverless Functions per deployment**. The original
+architecture placed one file per endpoint under `/api/`, which Vercel compiled into **23 functions**,
+and the deployment failed with:
+
+```
+No more than 12 Serverless Functions can be added to a Deployment on the Hobby plan.
+```
+
+Rather than deleting features or upgrading the plan, the backend was consolidated into **one**
+catch-all function. The `api/` directory now contains exactly one file:
+
+```
+api/
+└── [...route].js      ← the only Vercel Serverless Function
+```
+
+The handler inspects `req.url` and `req.method` and dispatches internally, so **the public API
+contract is unchanged** — every existing frontend call keeps working untouched.
+
+```js
+// lib/router.js — route table
+{ method: 'GET',  path: '/doctors',           handler: listDoctors }
+{ method: 'GET',  path: '/doctors/:id',       handler: listDoctors }
+{ method: 'POST', path: '/appointments',      handler: bookAppointment }
+{ method: 'GET',  path: '/prescriptions/:id', handler: listPrescriptions }
+```
+
+Static paths always match before parameterized ones, so `/appointments/status` wins over
+`/appointments/:id`. Path parameters are merged into the query object, which makes
+`/api/prescriptions/rx_1` and `/api/prescriptions?id=rx_1` equivalent.
+
+**Local development imports the exact same handler** — `scripts/dev-server.js` mounts
+`api/[...route].js` — so there is no behavioural drift between `npm run dev` and production.
+
+**Verifying the function count locally:**
+
+```bash
+# Must print exactly one file
+Get-ChildItem -Recurse -File api
+```
+
+---
 
 ---
 
@@ -81,38 +129,26 @@ Designed from the ground up for **Vercel Serverless Function architecture** with
 ```text
 HealthSphere/
 ├── api/                             # Vercel Serverless Functions
-│   ├── auth/
-│   │   ├── login.js                 # Authentication login
-│   │   ├── register.js              # User registration
-│   │   ├── logout.js                # Session logout
-│   │   └── me.js                    # Profile retrieval & updates
-│   ├── doctors/
-│   │   ├── index.js                 # Directory search & doctor details
-│   │   └── availability.js          # Practitioner schedule slots
-│   ├── appointments/
-│   │   ├── index.js                 # List & book appointments (no double booking)
-│   │   └── status.js                # Confirm, complete, cancel, reject
-│   ├── medical-records/
-│   │   └── index.js                 # Clinical records timeline
-│   ├── prescriptions/
-│   │   └── index.js                 # Digital prescriptions & printable Rx
-│   ├── lab-results/
-│   │   └── index.js                 # Diagnostic lab reports
-│   ├── wellness/
-│   │   ├── index.js                 # Daily wellness logs & metrics
-│   │   └── ai-assistant.js          # AI wellness coaching & safe fallback
-│   ├── blood/
-│   │   ├── donors.js                # Donor registry & directory
-│   │   ├── requests.js              # Blood requests & ABO/Rh matching
-│   │   ├── matches.js               # Donor responses & match status
-│   │   └── emergency.js             # Active emergency broadcasts
-│   ├── notifications/
-│   │   ├── index.js                 # User notification feed & unread count
-│   │   └── read.js                  # Mark notification as read
-│   └── admin/
-│       ├── stats.js                 # Platform overview metrics
-│       ├── users.js                 # User management & role updates
-│       └── audit-logs.js            # Security audit trail
+│   └── [...route].js                # ★ THE ONLY FUNCTION — catch-all /api/* handler
+│
+├── lib/                             # Backend modules (bundled into the function)
+│   ├── router.js                    # Route table + internal dispatcher
+│   ├── middleware.js                # Request context, RBAC, rate limiting, security headers
+│   ├── db.js                        # Turso / libSQL client connector
+│   ├── auth.js                      # Bcrypt, JWT, cookie, and RBAC guards
+│   ├── validation.js                # ABO/Rh compatibility rules, Haversine, validators
+│   ├── response.js                  # Standardized JSON response helpers
+│   ├── audit.js                     # Audit logging & notification dispatcher
+│   ├── accounts.js                  # Register, login, logout, profile
+│   ├── doctors.js                   # Directory search, detail, availability
+│   ├── appointments.js              # Listing, booking, status transitions
+│   ├── medical-records.js           # Clinical records timeline
+│   ├── lab-results.js               # Diagnostic lab reports
+│   ├── prescriptions.js             # Digital prescriptions & printable Rx
+│   ├── wellness.js                  # Wellness logs, /diet, /sleep, AI coach
+│   ├── blood.js                     # Donors, requests, matches, emergency
+│   ├── notifications.js             # Notification feed & read state
+│   └── admin.js                     # Stats, users, doctors, hospitals, audit logs
 │
 ├── database/
 │   ├── schema.sql                   # 13 normalized SQLite/libSQL tables
@@ -161,8 +197,9 @@ HealthSphere/
 │       └── admin.js                 # Platform metrics & user governance
 │
 ├── scripts/
-│   ├── dev-server.js                # Lightweight local development server
-│   └── test-all.js                  # End-to-end test suite
+│   ├── dev-server.js                # Local dev server (mounts api/[...route].js)
+│   ├── test-all.js                  # Unit & medical-logic test suite
+│   └── test-api.js                  # Full API integration suite
 │
 ├── vercel.json                      # Vercel deployment configuration
 ├── package.json                     # Node dependencies & run scripts
@@ -230,11 +267,13 @@ npm run db:init
 npm run db:seed
 ```
 
-### 4. Run Comprehensive Verification Tests
+### 4. Run Verification Tests
 ```bash
-npm test
+npm test          # 24 unit tests + 149 API integration assertions
+npm run test:unit # unit tests only
+npm run test:api  # API integration suite only
 ```
-*Executes all 24 automated unit and integration tests covering database queries, bcrypt hashing, JWT validation, medical ABO/Rh matrices, and Haversine proximity calculations.*
+*`test-all.js` covers database queries, bcrypt hashing, JWT validation, medical ABO/Rh matrices, and Haversine proximity calculations. `test-api.js` boots a real HTTP server against the catch-all handler and exercises registration, login, cookies, RBAC, double-booking prevention, every clinical endpoint, blood matching, admin governance, error status codes, and security headers.*
 
 ### 5. Start Development Server
 ```bash
@@ -299,7 +338,16 @@ npm run db:seed
    SESSION_SECRET      = your-production-random-32-byte-secret-key
    AI_API_KEY          = (optional)
    ```
-4. Click **Deploy**. Vercel will immediately deploy the static frontend assets and the serverless `/api/*` endpoints!
+4. Click **Deploy**. Vercel builds **one** Serverless Function (`api/[...route].js`) and serves the
+   static frontend from `public/`.
+
+> **Note:** No build command or Output Directory is required. `vercel.json` contains only security
+> headers and the static rewrites that map `/` → `/public/index.html` (the rest of `/api/*` is
+> handled natively by the catch-all function). `cleanUrls` is intentionally `false` because the
+> frontend links to explicit `.html` files.
+>
+> If you previously saw a 12-function limit error, it is resolved — verify with
+> `Get-ChildItem -Recurse -File api` (or `ls -R api`), which should return a single file.
 
 ---
 
@@ -307,38 +355,69 @@ npm run db:seed
 
 | Endpoint | Method | Role | Description |
 | :--- | :--- | :--- | :--- |
+| `/api` | `GET` | Public | Route index listing every available endpoint |
+| `/api/health` | `GET` | Public | Liveness probe |
 | `/api/auth/register` | `POST` | Public | Register new account (Patient, Doctor, Hospital) |
 | `/api/auth/login` | `POST` | Public | Log in with email and password |
 | `/api/auth/logout` | `POST` | Public | Clear session cookie |
-| `/api/auth/me` | `GET`, `PUT` | Authenticated | Fetch / update authenticated profile & doctor info |
+| `/api/auth/me` | `GET`, `PUT`, `PATCH` | Authenticated | Fetch / update authenticated profile & doctor info |
 | `/api/doctors` | `GET` | Public | Directory search with specialization/fee/location filters |
-| `/api/doctors/availability` | `GET`, `POST` | Doctor / Admin | View and update doctor weekly schedule |
-| `/api/appointments` | `GET`, `POST` | Patient / Doctor | List appointments or book slot (prevents double-booking) |
-| `/api/appointments/status`| `POST` | Patient / Doctor | Update appointment status (Confirm, Complete, Cancel, Reject) |
-| `/api/medical-records` | `GET`, `POST` | Doctor / Patient | View medical history timeline; doctors record diagnoses |
-| `/api/prescriptions` | `GET`, `POST` | Doctor / Patient | View or issue digital prescriptions; printable Rx details |
-| `/api/lab-results` | `GET`, `POST` | Doctor / Admin | Diagnostic lab reports |
-| `/api/wellness` | `GET`, `POST` | Patient | Record & view sleep, water, exercise, weight, mood |
-| `/api/wellness/ai-assistant`| `POST` | Patient | AI wellness assistant with clinical safety disclaimer |
-| `/api/blood/donors` | `GET`, `POST` | Authenticated | Volunteer blood donor directory & registration |
-| `/api/blood/requests` | `GET`, `POST` | Patient / Hospital| Submit blood requests with automatic ABO/Rh donor matching |
-| `/api/blood/matches` | `GET`, `POST` | Donor / Requester | Donor response to compatibility matches (Accept, Donate) |
+| `/api/doctors/:id` | `GET` | Public | Single doctor detail with availability |
+| `/api/doctors/availability` | `GET` | Doctor / Admin | View own weekly schedule |
+| `/api/doctors/availability` | `POST`, `PUT` | Doctor / Admin | Replace weekly schedule |
+| `/api/doctors/:id/availability` | `GET`, `POST`, `PUT` | Doctor / Admin | Schedule for a specific doctor |
+| `/api/appointments` | `GET` | Patient / Doctor / Admin | List appointments (role-scoped) |
+| `/api/appointments` | `POST` | Patient / Admin | Book slot (prevents double-booking, 409 on conflict) |
+| `/api/appointments/:id` | `GET` | Patient / Doctor / Admin | Single appointment detail |
+| `/api/appointments/status` | `POST`, `PATCH` | Patient / Doctor / Admin | Confirm, complete, cancel, reject |
+| `/api/appointments/:id` | `PATCH` | Patient / Doctor / Admin | Status update via path param |
+| `/api/medical-records` | `GET` | Patient / Doctor / Admin | View medical history timeline |
+| `/api/medical-records` | `POST` | Doctor / Admin | Record a diagnosis |
+| `/api/medical-records/:id` | `GET` | Patient / Doctor / Admin | Single clinical record |
+| `/api/prescriptions` | `GET` | Patient / Doctor / Admin | List prescriptions |
+| `/api/prescriptions` | `POST` | Doctor / Admin | Issue a digital prescription |
+| `/api/prescriptions/:id` | `GET` | Patient / Doctor / Admin | Printable Rx details |
+| `/api/lab-results` | `GET` | Patient / Doctor / Admin | Diagnostic lab reports |
+| `/api/lab-results` | `POST` | Doctor / Admin | Record a lab result |
+| `/api/lab-results/:id` | `GET` | Patient / Doctor / Admin | Single lab report |
+| `/api/wellness` | `GET`, `POST` | Patient / Admin | Daily wellness logs & metrics |
+| `/api/wellness/diet` | `GET`, `POST` | Patient / Admin | Diet entries only |
+| `/api/wellness/sleep` | `GET`, `POST` | Patient / Admin | Sleep entries only |
+| `/api/wellness/ai-assistant` | `POST` | Authenticated | AI wellness coaching with clinical disclaimer |
+| `/api/blood/donors` | `GET` | Public | Volunteer donor directory |
+| `/api/blood/donors` | `POST` | Authenticated | Register / update donor profile |
+| `/api/blood/donors/:id` | `GET` | Public | Single donor record |
+| `/api/blood/requests` | `GET` | Public | Blood requests with urgency filters |
+| `/api/blood/requests` | `POST` | Authenticated | Submit a request with automatic ABO/Rh donor matching |
+| `/api/blood/requests/:id` | `GET` | Public | Request detail with matched donors |
+| `/api/blood/requests/:id` | `PATCH` | Requester / Admin | Update request status |
+| `/api/blood/matches` | `GET`, `POST`, `PATCH` | Donor / Requester | Donor responses (Accept, Donate) |
+| `/api/blood/match` | `GET`, `POST`, `PATCH` | Donor / Requester | Alias of `/blood/matches` |
 | `/api/blood/emergency` | `GET` | Public | Live feed of critical emergency blood requests |
-| `/api/notifications` | `GET` | Authenticated | User notification center with unread count |
-| `/api/notifications/read` | `POST` | Authenticated | Mark notification(s) as read |
+| `/api/notifications` | `GET` | Authenticated | Notification center with unread count |
+| `/api/notifications/read` | `POST`, `PATCH` | Authenticated | Mark notification(s) as read |
 | `/api/admin/stats` | `GET` | Admin | Real-time platform statistics & recent activity |
-| `/api/admin/users` | `GET`, `PATCH`| Admin | User directory and role modifications |
+| `/api/admin/users` | `GET`, `PATCH` | Admin | User directory and role modifications |
+| `/api/admin/doctors` | `GET` | Admin | Doctor governance directory |
+| `/api/admin/hospitals` | `GET` | Admin | Hospital directory with request counts |
+| `/api/admin/appointments` | `GET` | Admin | All appointments across the platform |
+| `/api/admin/blood-requests` | `GET` | Admin | All blood requests with match counts |
 | `/api/admin/audit-logs` | `GET` | Admin | System-wide immutable security audit logs |
 
 ---
 
 ## 🛡️ Security & Privacy Implementation
 
-- **Password Encryption**: All passwords hashed using `bcryptjs` with 10 salt rounds. Plaintext passwords are never stored or logged.
-- **Role-Based Access Control (RBAC)**: Enforced both at the serverless API gateway (`requireAuth(req, res, allowedRoles)`) and within UI route controllers.
+- **Password Encryption**: All passwords hashed using `bcryptjs` with 10 salt rounds. Plaintext passwords are never stored, logged, or returned by any endpoint.
+- **Role-Based Access Control (RBAC)**: Enforced centrally in `lib/router.js` (per-route `roles`) and re-checked inside each handler for ownership (e.g. a patient may only cancel *their own* appointment).
+- **Privilege Escalation Prevention**: `POST /api/auth/register` refuses to self-provision the `ADMIN` role; administrators are only promoted through `PATCH /api/admin/users`.
 - **SQL Injection Prevention**: All queries use parameterized statements (`client.execute({ sql, args })`).
 - **XSS Mitigation**: Dynamic user-supplied values are escaped or set via `textContent` in the DOM layer.
-- **Security Headers**: Standard `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`, `X-XSS-Protection: 1; mode=block`, and `Referrer-Policy: strict-origin-when-cross-origin` pre-configured in `vercel.json`.
+- **Secure Sessions**: HTTP-only, `SameSite=Lax`, `Secure` in production cookies, with a Bearer-token fallback. Tokens are never written to `localStorage` server-side or exposed in API payloads beyond the login response.
+- **Rate Limiting**: Fixed-window per-IP limits on auth (login 30/min, register 20/min) and blood-request creation (60/min), returning `429` with a `Retry-After` header.
+- **Error Hygiene**: Database errors are logged server-side and never returned to the client; `details` is only attached outside production.
+- **Security Headers**: `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`, `Referrer-Policy: strict-origin-when-cross-origin`, `Permissions-Policy`, and `Cache-Control: no-store` on all `/api/*` responses.
+- **Secret Hygiene**: `.env` is git-ignored; Turso credentials are read only from server-side environment variables and are never bundled to the frontend.
 
 ---
 
